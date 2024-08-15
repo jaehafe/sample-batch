@@ -15,25 +15,22 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @EnableJpaRepositories(
         basePackages = "org.jh.samplebatch.repository",
-        entityManagerFactoryRef = "dataEntityManager",
+        entityManagerFactoryRef = "dataEntityManagerFactory",
         transactionManagerRef = "dataTransactionManager"
 )
 public class DataDBConfig {
 
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource.data")
-    public DataSource dataDBSource() {
-
+    public DataSource dataDataSource() {
         return DataSourceBuilder.create().build();
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean dataEntityManager() {
-
+    public LocalContainerEntityManagerFactoryBean dataEntityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-
-        em.setDataSource(dataDBSource());
-        em.setPackagesToScan(new String[]{"com.jh.samplebatch.entity"});
+        em.setDataSource(dataDataSource());
+        em.setPackagesToScan(new String[]{"org.jh.samplebatch.entity"});
         em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         HashMap<String, Object> properties = new HashMap<>();
@@ -46,11 +43,8 @@ public class DataDBConfig {
 
     @Bean
     public PlatformTransactionManager dataTransactionManager() {
-
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-
-        transactionManager.setEntityManagerFactory(dataEntityManager().getObject());
-
+        transactionManager.setEntityManagerFactory(dataEntityManagerFactory().getObject());
         return transactionManager;
     }
 }
